@@ -24,8 +24,8 @@
 
 #include "caf/none.hpp"
 
-#include "caf/duration.hpp"
 #include "caf/timeout_definition.hpp"
+#include "caf/timestamp.hpp"
 
 #include "caf/detail/type_list.hpp"
 #include "caf/detail/type_traits.hpp"
@@ -91,7 +91,7 @@ public:
 
   /// Returns the duration after which receive operations
   /// using this behavior should time out.
-  inline const duration& timeout() const {
+  inline timespan timeout() const {
     return impl_->timeout();
   }
 

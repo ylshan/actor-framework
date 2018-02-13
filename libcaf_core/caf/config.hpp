@@ -64,6 +64,9 @@
 #  define CAF_CLANG
 #  define CAF_DEPRECATED __attribute__((deprecated))
 #  define CAF_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
+#  define CAF_PUSH_DEPRECATED_WARNINGS                                         \
+    _Pragma("clang diagnostic push")                                           \
+    _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
 #  define CAF_PUSH_WARNINGS                                                    \
     _Pragma("clang diagnostic push")                                           \
     _Pragma("clang diagnostic ignored \"-Wall\"")                              \
@@ -106,7 +109,10 @@
 #  define CAF_GCC
 #  define CAF_DEPRECATED __attribute__((deprecated))
 #  define CAF_DEPRECATED_MSG(msg) __attribute__((deprecated(msg)))
-#  define CAF_PUSH_WARNINGS
+#  define CAF_PUSH_DEPRECATED_WARNINGS                                         \
+    _Pragma("GCC diagnostic push")                                             \
+    _Pragma("clang diagnostic ignored \"-Wdeprecated-declarations\"")
+#  define CAF_PUSH_WARNINGS                                                    \
     _Pragma("GCC diagnostic push")                                             \
     _Pragma("GCC diagnostic ignored \"-Wshadow\"")                             \
     _Pragma("GCC diagnostic ignored \"-Wpragmas\"")                            \

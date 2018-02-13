@@ -219,7 +219,7 @@ public:
 
   /// Returns the duration after which receives using
   /// this behavior should time out.
-  const duration& timeout() const {
+  timespan timeout() const {
     return bhvr_.timeout();
   }
 

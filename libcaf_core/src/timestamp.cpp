@@ -20,6 +20,12 @@
 
 namespace caf {
 
+#CAF_PUSH_DEPRECATED_WARNINGS
+infinite_t::operator duration() const {
+  return duration{time_unit::invalid, 0};
+}
+#CAF_POP_WARNINGS
+
 timestamp make_timestamp() {
   return std::chrono::system_clock::now();
 }

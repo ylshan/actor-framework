@@ -31,11 +31,11 @@
 
 #include "caf/atom.hpp"
 #include "caf/message.hpp"
-#include "caf/duration.hpp"
 #include "caf/ref_counted.hpp"
-#include "caf/skip.hpp"
 #include "caf/response_promise.hpp"
+#include "caf/skip.hpp"
 #include "caf/timeout_definition.hpp"
+#include "caf/timestamp.hpp"
 #include "caf/typed_response_promise.hpp"
 
 #include "caf/detail/int_list.hpp"
@@ -59,7 +59,7 @@ public:
 
   ~behavior_impl() override;
 
-  behavior_impl(duration tout = duration{});
+  behavior_impl(timespan tout = infinite);
 
   virtual match_case::result invoke_empty(detail::invoke_result_visitor& f);
 
@@ -74,14 +74,14 @@ public:
 
   virtual void handle_timeout();
 
-  inline const duration& timeout() const {
+  inline timespan timeout() const {
     return timeout_;
   }
 
   pointer or_else(const pointer& other);
 
 protected:
-  duration timeout_;
+  timespan timeout_;
   match_case_info* begin_;
   match_case_info* end_;
 };

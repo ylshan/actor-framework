@@ -20,16 +20,42 @@
 #define CAF_TIMESTAMP_HPP
 
 #include <chrono>
-#include <string>
 #include <cstdint>
+#include <limits>
+#include <string>
+
+#include "caf/config.hpp"
+#include "caf/fwd.hpp"
 
 namespace caf {
 
+/// A portable timespan type with nanosecond resolution.
+using timespan = std::chrono::duration<int64_t, std::nano>;
+
+CAF_PUSH_DEPRECATED_WARNINGS
+
+/// Represents an "infinitely" long timeout, i.e., a timespan with maximum
+/// count (0x7FFFFFFFFFFFFFFF or approx. 292 years).
+struct infinite_t {
+  constexpr infinite_t() {
+    // nop
+  }
+
+  /// Returns `timespan::max()`.
+  constexpr operator timespan() const {
+    return timespan::max();
+  }
+
+  operator duration() const;
+};
+
+CAF_POP_WARNINGS
+
+/// Convenience constant for defining infinite timeouts.
+static constexpr infinite_t infinite = infinite_t{};
+
 /// A portable timestamp with nanosecond resolution anchored at the UNIX epoch.
-using timestamp = std::chrono::time_point<
-  std::chrono::system_clock,
-  std::chrono::duration<int64_t, std::nano>
->;
+using timestamp = std::chrono::time_point<std::chrono::system_clock, timespan>;
 
 /// Convenience function for returning a `timestamp` representing
 /// the current system time.

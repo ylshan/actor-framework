@@ -24,7 +24,9 @@
 #include <cstdint>
 #include <stdexcept>
 
+#include "caf/config.hpp"
 #include "caf/error.hpp"
+#include "caf/timestamp.hpp"
 
 namespace caf {
 
@@ -76,15 +78,6 @@ constexpr time_unit get_time_unit_from_period() {
   return ratio_to_time_unit_helper<Period::num, Period::den>::value;
 }
 
-/// Represents an infinite amount of timeout for specifying "invalid" timeouts.
-struct infinite_t {
-  constexpr infinite_t() {
-    // nop
-  }
-};
-
-static constexpr infinite_t infinite = infinite_t{};
-
 /// Time duration consisting of a `time_unit` and a 64 bit unsigned integer.
 class duration {
 public:
@@ -93,10 +86,6 @@ public:
   }
 
   constexpr duration(time_unit u, uint32_t v) : unit(u), count(v) {
-    // nop
-  }
-
-  constexpr duration(infinite_t) : unit(time_unit::invalid), count(0) {
     // nop
   }
 
@@ -127,7 +116,9 @@ public:
   time_unit unit;
 
   uint64_t count;
-};
+} CAF_DEPRECATED_MSG("use timespan instead");
+
+CAF_PUSH_DEPRECATED_WARNINGS
 
 /// @relates duration
 template <class Inspector>
@@ -172,28 +163,7 @@ operator+=(std::chrono::time_point<Clock, Duration>& lhs, const duration& rhs) {
   return lhs;
 }
 
-namespace literals {
-
-constexpr duration operator"" _min(unsigned long long x) {
-  return {time_unit::minutes, static_cast<uint32_t>(x)};
-}
-
-constexpr duration operator"" _s(unsigned long long x) {
-  return {time_unit::seconds, static_cast<uint32_t>(x)};
-}
-constexpr duration operator"" _ms(unsigned long long x) {
-  return {time_unit::milliseconds, static_cast<uint32_t>(x)};
-}
-
-constexpr duration operator"" _us(unsigned long long x) {
-  return {time_unit::microseconds, static_cast<uint32_t>(x)};
-}
-
-constexpr duration operator"" _ns(unsigned long long x) {
-  return {time_unit::nanoseconds, static_cast<uint32_t>(x)};
-}
-
-} // namespace literals
+CAF_POP_WARNINGS
 
 } // namespace caf
 

@@ -28,7 +28,7 @@ namespace caf {
 
 class timeout_definition_builder {
 public:
-  constexpr timeout_definition_builder(duration d) : tout_(d) {
+  constexpr timeout_definition_builder(timespan d) : tout_(d) {
     // nop
   }
 
@@ -38,11 +38,11 @@ public:
   }
 
 private:
-  duration tout_;
+  timespan tout_;
 };
 
 /// Returns a generator for timeouts.
-constexpr timeout_definition_builder after(duration d) {
+constexpr timeout_definition_builder after(timespan d) {
   return {d};
 }
 
@@ -50,7 +50,7 @@ constexpr timeout_definition_builder after(duration d) {
 template <class Rep, class Period>
 constexpr timeout_definition_builder
 after(std::chrono::duration<Rep, Period> d) {
-  return after(duration{d});
+  return {std::chrono::duration_cast<timespan>(d)};
 }
 
 } // namespace caf
