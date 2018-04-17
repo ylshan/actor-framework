@@ -163,7 +163,7 @@ def do_ms_stuff(tags,
     checkout scm
     // Configure and build.
     // installation can be either 'cmake auto install' or 'cmake in search path'
-    cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts -DCMAKE_MAKE_PROGRAM:PATH=\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\MSBuild\\15.0\\Bin\\MSBuild.exe\"", generator: "$generator", installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
+    cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts -DCMAKE_MAKE_PROGRAM:PATH='C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\MSBuild\\15.0\\Bin\\MSBuild.exe'", generator: "$generator", installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
     /*
     def ret = bat(returnStatus: true,
               script: """cmake -E make_directory build
