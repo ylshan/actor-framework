@@ -117,8 +117,9 @@ pipeline {
         subject: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
         body: """<p>FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
                  <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
+        // TODO: Uncomment the following line:
         // recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-        to: 'hiesgen'
+        to: 'eumann; hiesgen'
             // recipientProviders: [[$class: 'DevelopersRecipientProvider']]
       )
       // This does not seem to work outside a node environment:
