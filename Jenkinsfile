@@ -95,22 +95,14 @@ pipeline {
         }
       }
     }
-    /*
-    stage ('Test') {
-      steps {
-        // execute unit tests?
-        echo "Testing all the things"
-      }
-    }
-    */
   }
   post {
     success {
-      echo "Yeah!"
+      echo "Success."
       // TODO: Gitter?
     }
     failure {
-      echo "God damn it! But there don't seem to be mails at all ..."
+      echo "Failure, sending mails!"
       // TODO: Gitter?
       emailext(
         subject: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
@@ -165,12 +157,12 @@ def do_ms_stuff(tags,
                 generator = "Visual Studio 15 2017",
                 build_opts = "",
                 clean_build = true) {
-  withEnv(['PATH=C:\\Windows\\System32;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd']) {
+  withEnv(['PATH=C:\\Windows\\System32;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\bin']) {
     deleteDir()
     // TODO: pull from mirror, not from GitHub, (RIOT fetch func?)
     checkout scm
     // Configure and build.
-    cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts", generator: "$generator", installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
+    cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts", generator: "$generator", installation: 'cmake auto install', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
     // Test.
     ctest arguments: '--output-on-failure', installation: 'cmake auto install', workingDir: 'build'
   }
