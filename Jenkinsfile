@@ -112,18 +112,16 @@ pipeline {
     failure {
       echo "God damn it! But there don't seem to be mails at all ..."
       // TODO: Gitter?
-      // TODO: Email
       emailext(
         subject: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-        body: """<p>FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
-                 <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
+        body: """FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':
+                 Check console output at "${env.BUILD_URL}"
+                 Job: ${env.JOB_NAME}
+                 Build number: ${env.BUILD_NUMBER}""",
         // TODO: Uncomment the following line:
         // recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-        to: 'eumann; hiesgen'
-            // recipientProviders: [[$class: 'DevelopersRecipientProvider']]
+        to: 'hiesgen' // add multiple separated with ';'
       )
-      // This does not seem to work outside a node environment:
-      // step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
     }
   }
 }
