@@ -113,15 +113,13 @@ pipeline {
       echo "God damn it! But there don't seem to be mails at all ..."
       // TODO: Gitter?
       // TODO: Email
-      /*
       emailext(
         subject: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
         body: """<p>FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
                  <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",
-        recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+        recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']]
             // recipientProviders: [[$class: 'DevelopersRecipientProvider']]
       )
-      */
       // This does not seem to work outside a node environment:
       // step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
     }
@@ -134,15 +132,13 @@ def do_unix_stuff(tags,
                   generator = "Unix Makefiles",
                   build_opts = "",
                   clean_build = true) {
-  echo "A"
+  currentBuild.result = 'FAILURE'
+  return
   deleteDir()
-  echo "B"
   // TODO: pull from mirror, not from GitHub, (RIOT fetch func?)
-  checkout scm
-  echo "C"
+  // checkout scm
   // Configure and build.
   cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts", generator: "$generator", installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
-  echo "D"
   // Some setup also done in previous setups.
   ret = sh(returnStatus: true,
            script: """#!/bin/bash +ex
@@ -156,16 +152,13 @@ def do_unix_stuff(tags,
                         export ASAN_OPTIONS=detect_leaks=1
                       fi
                       exit 0""")
-  echo "E"
   if (ret) {
     echo "[!!!] Setting up variables failed!"
     currentBuild.result = 'FAILURE'
     return
   }
-  echo "F"
   // Test.
   ctest arguments: '--output-on-failure', installation: 'cmake auto install', workingDir: 'build'
-  echo "G"
 }
 
 def do_ms_stuff(tags,
