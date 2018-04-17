@@ -57,11 +57,11 @@ pipeline {
     stage ('Build & Test') {
       parallel {
         // gcc builds
+        /*
         stage ("Linux && gcc4.8") {
           agent { label "Linux && gcc4.8" }
           steps { do_unix_stuff("Linux && gcc4.8", gcc_cmake_opts) }
         }
-        /*
         stage ("Linux && gcc4.9") {
           agent { label "Linux && gcc4.9" }
           steps { do_unix_stuff("Linux && gcc4.9", gcc_cmake_opts) }
@@ -87,12 +87,12 @@ pipeline {
           agent { label "Linux && clang && LeakSanitizer" }
           steps { do_unix_stuff("Linux && clang && LeakSanitizer", clang_cmake_opts) }
         }
+        */
         // windows builds
         stage('msbuild') {
           agent { label "msbuild" }
           steps { do_ms_stuff("msbuild", msbuild_opts) }
         }
-        */
       }
     }
     /*
