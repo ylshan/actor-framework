@@ -140,10 +140,8 @@ def do_unix_stuff(tags,
   // TODO: pull from mirror, not from GitHub, (RIOT fetch func?)
   checkout scm
   echo "C"
-  cmake installation: 'cmake in search path', workingDir: 'build'
-  echo "C2"
   // Configure and build.
-  cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: $clean_build, cmakeArgs: "$cmake_opts", generator: $generator, installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
+  cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts", generator: $generator, installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
   echo "D"
   // Some setup also done in previous setups.
   ret = sh(returnStatus: true,
@@ -181,7 +179,7 @@ def do_ms_stuff(tags,
     // TODO: pull from mirror, not from GitHub, (RIOT fetch func?)
     checkout scm
     // Configure and build.
-    cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: $clean_build, cmakeArgs: "$cmake_opts", generator: $generator, installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
+    cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts", generator: $generator, installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
     // Test.
     ctest arguments: '--output-on-failure', installation: 'cmake auto install', workingDir: 'build'
   }
