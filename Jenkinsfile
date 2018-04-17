@@ -132,8 +132,6 @@ def do_unix_stuff(tags,
                   generator = "Unix Makefiles",
                   build_opts = "",
                   clean_build = true) {
-  currentBuild.result = 'FAILURE'
-  return
   deleteDir()
   // TODO: pull from mirror, not from GitHub, (RIOT fetch func?)
   // checkout scm
