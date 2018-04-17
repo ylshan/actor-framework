@@ -162,8 +162,35 @@ def do_ms_stuff(tags,
     // TODO: pull from mirror, not from GitHub, (RIOT fetch func?)
     checkout scm
     // Configure and build.
-    cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts", generator: "$generator", installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
     // installation can be either 'cmake auto install' or 'cmake in search path'
+    // cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts -DCMAKE_MAKE_PROGRAM:PATH=", generator: "$generator", installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
+    def ret = bat(returnStatus: true,
+              script: """cmake -E make_directory build
+                         cd build
+                         cmake -DCMAKE_BUILD_TYPE=${build_type} -G "${generator}" ${cmake_opts} ..
+                         IF /I "%ERRORLEVEL%" NEQ "0" (
+                           EXIT 1
+                         )
+                         cat build/CMakeCache.txt
+                         EXIT 0""")
+    if (ret) {
+      echo "[!!!] Configure failed!"
+      currentBuild.result = 'FAILURE'
+      return
+    }
+    // bat "echo \"Step: Build for '${tags}'\""
+    ret = bat(returnStatus: true,
+              script: """cd build
+                         cmake --build .
+                         IF /I "%ERRORLEVEL%" NEQ "0" (
+                           EXIT 1
+                         )
+                         EXIT 0""")
+    if (ret) {
+      echo "[!!!] Build failed!"
+      currentBuild.result = 'FAILURE'
+      return
+    }
     // Test.
     ctest arguments: '--output-on-failure', installation: 'cmake auto install', workingDir: 'build'
   }
