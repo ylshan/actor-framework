@@ -57,7 +57,6 @@ pipeline {
     stage ('Build & Test') {
       parallel {
         // gcc builds
-        /*
         stage ("Linux && gcc4.8") {
           agent { label "Linux && gcc4.8" }
           steps { do_unix_stuff("Linux && gcc4.8", gcc_cmake_opts) }
@@ -87,7 +86,6 @@ pipeline {
           agent { label "Linux && clang && LeakSanitizer" }
           steps { do_unix_stuff("Linux && clang && LeakSanitizer", clang_cmake_opts) }
         }
-        */
         // windows builds
         stage('msbuild') {
           agent { label "msbuild" }
@@ -163,8 +161,7 @@ def do_ms_stuff(tags,
     checkout scm
     // Configure and build.
     // installation can be either 'cmake auto install' or 'cmake in search path'
-    cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts -DCMAKE_MAKE_PROGRAM:PATH='C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\MSBuild\\15.0\\Bin\\MSBuild.exe'", generator: "$generator", installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
-    /*
+    // cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts", generator: "$generator", installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
     def ret = bat(returnStatus: true,
               script: """cmake -E make_directory build
                          cd build
@@ -192,7 +189,6 @@ def do_ms_stuff(tags,
       currentBuild.result = 'FAILURE'
       return
     }
-    */
     // Test.
     ctest arguments: '--output-on-failure', installation: 'cmake auto install', workingDir: 'build'
   }
