@@ -61,6 +61,7 @@ pipeline {
           agent { label "Linux && gcc4.8" }
           steps { do_unix_stuff("Linux && gcc4.8", gcc_cmake_opts) }
         }
+        /*
         stage ("Linux && gcc4.9") {
           agent { label "Linux && gcc4.9" }
           steps { do_unix_stuff("Linux && gcc4.9", gcc_cmake_opts) }
@@ -91,14 +92,17 @@ pipeline {
           agent { label "msbuild" }
           steps { do_ms_stuff("msbuild", msbuild_opts) }
         }
+        */
       }
     }
+    /*
     stage ('Test') {
       steps {
         // execute unit tests?
         echo "Testing all the things"
       }
     }
+    */
   }
   post {
     success {
@@ -130,11 +134,15 @@ def do_unix_stuff(tags,
                   generator = "Unix Makefiles",
                   build_opts = "",
                   clean_build = true) {
+  echo "A"
   deleteDir()
+  echo "B"
   // TODO: pull from mirror, not from GitHub, (RIOT fetch func?)
   checkout scm
+  echo "C"
   // Configure and build.
   cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: $clean_build, cmakeArgs: "$cmake_opts", generator: $generator, installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
+  echo "D"
   // Some setup also done in previous setups.
   ret = sh(returnStatus: true,
            script: """#!/bin/bash +ex
@@ -148,13 +156,16 @@ def do_unix_stuff(tags,
                         export ASAN_OPTIONS=detect_leaks=1
                       fi
                       exit 0""")
+  echo "E"
   if (ret) {
     echo "[!!!] Setting up variables failed!"
     currentBuild.result = 'FAILURE'
     return
   }
+  echo "F"
   // Test.
   ctest arguments: '--output-on-failure', installation: 'cmake auto install', workingDir: 'build'
+  echo "G"
 }
 
 def do_ms_stuff(tags,
