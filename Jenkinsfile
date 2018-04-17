@@ -109,6 +109,7 @@ pipeline {
       echo "God damn it! But there don't seem to be mails at all ..."
       // TODO: Gitter?
       // TODO: Email
+      /*
       emailext(
         subject: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
         body: """<p>FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
@@ -116,6 +117,7 @@ pipeline {
         recipientProviders: [[$class: 'CulpritsRecipientProvider']]
             // recipientProviders: [[$class: 'DevelopersRecipientProvider']]
       )
+      */
       // This does not seem to work outside a node environment:
       // step([$class: 'Mailer', notifyEveryUnstableBuild: true, recipients: emailextrecipients([[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider']])])
     }
@@ -126,37 +128,14 @@ def do_unix_stuff(tags,
                   cmake_opts = "",
                   build_type = "Debug",
                   generator = "Unix Makefiles",
-                  build_opts = "") {
+                  build_opts = "",
+                  clean_build = true) {
   deleteDir()
-  // echo "Starting build with '${tags}'"
-  // echo "Checkout"
   // TODO: pull from mirror, not from GitHub, (RIOT fetch func?)
   checkout scm
-  // echo "Step: Configure for '${tags}'"
-  def ret = sh(returnStatus: true,
-               script: """#!/bin/bash +ex
-                          mkdir build || exit 1
-                          cd build || exit 1
-                          cmake -C ../cmake/jenkins.cmake -DCMAKE_BUILD_TYPE=$build_type -G "$generator" $cmake_opts .. || exit 1
-                          cmake --build . || exit 1
-                          exit 0""")
-  if (ret) {
-    echo "[!!!] Configure failed!"
-    currentBuild.result = 'FAILURE'
-    return
-  }
-  // echo "Step: Build for '${tags}'"
-  ret = sh(returnStatus: true,
-           script: """#!/bin/bash +ex
-                      cd build || exit 1
-                      cmake --build . || exit 1
-                      exit 0""")
-  if (ret) {
-    echo "[!!!] Build failed!"
-    currentBuild.result = 'FAILURE'
-    return
-  }
-  // echo "Step: Test for '${tags}'"
+  // Configure and build.
+  cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: $clean_build, cmakeArgs: "$cmake_opts", generator: $generator, installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
+  // Some setup also done in previous setups.
   ret = sh(returnStatus: true,
            script: """#!/bin/bash +ex
                       cd build || exit 1
@@ -168,73 +147,29 @@ def do_unix_stuff(tags,
                         export LD_LIBRARY_PATH="$PWD/build/lib"
                         export ASAN_OPTIONS=detect_leaks=1
                       fi
-                      ctest --output-on-failure . || exit 1
                       exit 0""")
   if (ret) {
-    echo "[!!!] Test failed!"
+    echo "[!!!] Setting up variables failed!"
     currentBuild.result = 'FAILURE'
     return
   }
-  if (currentBuild.result != "FAILURE") {
-    echo "${tags}: SUCCESS"
-    currentBuild.result = 'SUCCESS'
-  }
+  // Test.
+  ctest arguments: '--output-on-failure', installation: 'cmake auto install', workingDir: 'build'
 }
 
 def do_ms_stuff(tags,
                 cmake_opts = "",
                 build_type = "Debug",
                 generator = "Visual Studio 15 2017",
-                build_opts = "") {
+                build_opts = "",
+                clean_build = true) {
   withEnv(['PATH=C:\\Windows\\System32;C:\\Program Files\\CMake\\bin;C:\\Program Files\\Git\\cmd']) {
     deleteDir()
-    // bat "echo \"Starting build with \'${tags}\'\""
-    // bat 'echo "Checkout"'
     // TODO: pull from mirror, not from GitHub, (RIOT fetch func?)
     checkout scm
-    // bat "echo \"Step: Configure for '${tags}'\""
-    def ret = bat(returnStatus: true,
-                  script: """cmake -E make_directory build
-                             cd build
-                             cmake -DCMAKE_BUILD_TYPE=${build_type} -G "${generator}" ${cmake_opts} ..
-                             IF /I "%ERRORLEVEL%" NEQ "0" (
-                               EXIT 1
-                             )
-                             EXIT 0""")
-    if (ret) {
-      echo "[!!!] Configure failed!"
-      currentBuild.result = 'FAILURE'
-      return
-    }
-    // bat "echo \"Step: Build for '${tags}'\""
-    ret = bat(returnStatus: true,
-              script: """cd build
-                         cmake --build .
-                         IF /I "%ERRORLEVEL%" NEQ "0" (
-                           EXIT 1
-                         )
-                         EXIT 0""")
-    if (ret) {
-      echo "[!!!] Build failed!"
-      currentBuild.result = 'FAILURE'
-      return
-    }
-    // bat "echo \"Step: Test for '${tags}'\""
-    ret = bat(returnStatus: true,
-              script: """cd build
-                         ctest --output-on-failure .
-                         IF /I "%ERRORLEVEL%" NEQ "0" (
-                           EXIT 1
-                         )
-                         EXIT 0""")
-    if (ret) {
-      echo "[!!!] Test failed!"
-      currentBuild.result = 'FAILURE'
-      return
-    }
-    if (currentBuild.result != "FAILURE") {
-      echo "${tags}: SUCCESS"
-      currentBuild.result = 'SUCCESS'
-    }
+    // Configure and build.
+    cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: $clean_build, cmakeArgs: "$cmake_opts", generator: $generator, installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
+    // Test.
+    ctest arguments: '--output-on-failure', installation: 'cmake auto install', workingDir: 'build'
   }
 }
