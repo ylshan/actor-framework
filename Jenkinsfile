@@ -162,7 +162,8 @@ def do_ms_stuff(tags,
     // TODO: pull from mirror, not from GitHub, (RIOT fetch func?)
     checkout scm
     // Configure and build.
-    cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts", generator: "$generator", installation: 'cmake auto install', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
+    cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts", generator: "$generator", installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
+    // installation can be either 'cmake auto install' or 'cmake in search path'
     // Test.
     ctest arguments: '--output-on-failure', installation: 'cmake auto install', workingDir: 'build'
   }
