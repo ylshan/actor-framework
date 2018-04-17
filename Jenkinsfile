@@ -138,8 +138,9 @@ def do_unix_stuff(tags,
   deleteDir()
   echo "B"
   // TODO: pull from mirror, not from GitHub, (RIOT fetch func?)
-  checkout scm
-  echo "C"
+  // checkout scm
+  // echo "C"
+  cmake installation: 'cmake in search path', workingDir: 'build'
   // Configure and build.
   cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: $clean_build, cmakeArgs: "$cmake_opts", generator: $generator, installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
   echo "D"
