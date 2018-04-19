@@ -124,9 +124,9 @@ def do_unix_stuff(tags,
                   clean_build = true) {
   deleteDir()
   // TODO: pull from mirror, not from GitHub, (RIOT fetch func?)
-  // checkout scm
+  checkout scm
   // Configure and build.
-  cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts", generator: "$generator", installation: 'cmake in search path', sourceDir: '.', steps: [[args: 'all']]
+  cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts", generator: "$generator", installation: 'cmake in search path', preloadScript: '../cmake/jenkins.cmake', sourceDir: '.', steps: [[args: 'all']]
   // Some setup also done in previous setups.
   ret = sh(returnStatus: true,
            script: """#!/bin/bash +ex
