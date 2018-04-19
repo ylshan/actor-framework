@@ -127,7 +127,7 @@ def do_unix_stuff(tags,
   // checkout scm
   // Configure and build.
   sh 'pwd'
-  sd 'ls'
+  sh 'ls'
   def preload = pwd()
   cmakeBuild buildDir: 'build', buildType: "$build_type", cleanBuild: clean_build, cmakeArgs: "$cmake_opts", generator: "$generator", installation: 'cmake in search path', preloadScript: "${preload}/cmake/jenkins.cmake", sourceDir: '.', steps: [[args: 'all']]
   // Some setup also done in previous setups.
